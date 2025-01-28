@@ -5,6 +5,12 @@ import { hash } from 'bcrypt'
 import { AppError } from '../utils/AppError'
 
 export class UsersController{
+    async index(req: Request, res: Response){
+        const users = await prisma.users.findMany()
+
+        res.json(users)
+    }
+
     async create(req: Request, res: Response){
         const bodySchema = z.object({
             name: z.string().max(100, "máximo 100 caracteres").trim(),
