@@ -5,7 +5,15 @@ import { AppError } from '../utils/AppError'
 
 export class TeamsController{
     async index(req: Request, res: Response){
-        const teams = await prisma.teams.findMany()
+        const teams = await prisma.teams.findMany({
+            include: {
+                TeamMembers: {
+                    select: {
+                        Users: true
+                    }
+                }
+            }
+        })
 
         res.json(teams)
     }

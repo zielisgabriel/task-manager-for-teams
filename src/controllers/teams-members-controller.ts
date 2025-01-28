@@ -18,6 +18,10 @@ export class TeamsMembersController{
             throw new AppError('Usuário já existente no time', 401)
         }
 
+        await prisma.teamMembers.create({
+            data: { userId, teamId }
+        })
+
         res.status(201).json()
     }
 }
