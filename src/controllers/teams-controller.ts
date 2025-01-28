@@ -9,7 +9,24 @@ export class TeamsController{
             include: {
                 TeamMembers: {
                     select: {
-                        Users: true
+                        Users: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                                task: {
+                                    select: {
+                                        id: true,
+                                        title: true,
+                                        description: true,
+                                        status: true,
+                                        priority: true,
+                                        createdAt: true,
+                                        updatedAt: true,
+                                    }
+                                },
+                            }
+                        }
                     }
                 }
             }
