@@ -29,6 +29,6 @@ export class SessionsController{
             subject: session.id,
         })
 
-        res.status(201).json(token)
+        res.status(201).json({ token })
     }
 }
