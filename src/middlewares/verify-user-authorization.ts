@@ -7,6 +7,6 @@ export function verifyUserAuthorization(role: string[]){
             throw new AppError('Não autorizado', 401)
         }
 
-        next()
+        return next()
     }
 }
