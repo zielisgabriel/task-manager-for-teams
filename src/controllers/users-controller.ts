@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import z from 'zod'
 import { prisma } from '../database/prisma'
 import { hash } from 'bcrypt'
+import { AppError } from '../utils/AppError'
 
 export class UsersController{
     async create(req: Request, res: Response){
@@ -12,6 +13,12 @@ export class UsersController{
         })
 
         const { name, email, password } = bodySchema.parse(req.body)
+
+        if(await prisma.users.findFirst({
+            where: { email }
+        })){
+            throw new AppError('Email já cadastrado', 401)
+        }
 
         const hashPassword = await hash(password, 10)
 
