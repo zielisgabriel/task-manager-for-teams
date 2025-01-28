@@ -24,5 +24,5 @@ export function ensureAuthentication(req: Request, res: Response, next: NextFunc
         role,
     }
 
-    next()
+    return next()
 }
