@@ -6,3 +6,77 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum RoleUsers {
+  ADMIN
+  MEMBER
+}
+
+model Users {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String    @unique
+  role      RoleUsers @default(MEMBER)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  task        Tasks[]
+  TeamMembers TeamMembers[]
+
+  @@map("users")
+}
+
+model Teams {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  Tasks       Tasks[]
+  TeamMembers TeamMembers[]
+
+  @@map("teams")
+}
+
+model TeamMembers {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  teamId    String   @map("team_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  Users Users @relation(fields: [userId], references: [id])
+  Teams Teams @relation(fields: [teamId], references: [id])
+
+  @@map("team_members")
+}
+
+enum StatusTasks {
+  PENDING
+  IN_PROCESS
+  COMPLETED
+}
+
+enum PriorityTasks {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+model Tasks {
+  id          String        @id @default(uuid())
+  title       String
+  description String?
+  status      StatusTasks   @default(PENDING)
+  priority    PriorityTasks
+  assignedTo  String        @map("assigned_to")
+  teamId      String        @map("team_id")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  Users Users @relation(fields: [assignedTo], references: [id])
+  Teams Teams @relation(fields: [teamId], references: [id])
+
+  @@map("tasks")
+}
