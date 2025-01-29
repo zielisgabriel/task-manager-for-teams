@@ -81,4 +81,80 @@ export class TasksController{
 
         res.status(201).json()
     }
+    
+    async updateStatus(req: Request, res: Response){
+        if(req.user.role = 'ADMIN'){
+            const idSchema = z.object({
+                id: z.string().uuid()
+            })
+            
+            const bodySchema = z.object({
+                status: z.enum(['PENDING', 'IN_PROCESS', 'COMPLETED']).optional(),
+                priority: z.enum(['HIGH', 'MEDIUM', 'LOW']).optional(),
+            })
+
+            const { id } = idSchema.parse(req.params)
+            const { status, priority } = bodySchema.parse(req.body)
+
+            await prisma.tasks.update({
+                where: {
+                    id,
+                },
+                data: {
+                    status,
+                    priority,
+                }
+            })
+            
+            res.json()
+            return
+        }
+
+        const idSchema = z.object({
+            id: z.string().uuid()
+        })
+        
+        const bodySchema = z.object({
+            status: z.enum(['PENDING', 'IN_PROCESS', 'COMPLETED'])
+        })
+        
+        const { id } = idSchema.parse(req.params)
+        
+        const taskOfUser = await prisma.tasks.findFirst({
+            where: {
+                id,
+                Users: {
+                    id: req.user.user_id
+                },
+            }
+        })
+
+        if(taskOfUser?.status === 'COMPLETED'){
+            throw new AppError('Tarefa completada. Não pode ser alterada!')
+        }
+        
+        if(!taskOfUser){
+            throw new AppError('Essa task não pertence ao seu usuário', 401)
+        }
+        
+        const { status } = bodySchema.parse(req.body)
+
+        if(status === 'PENDING'){
+            throw new AppError('Não é possível alterar o status para pendente!')
+        }
+        
+        await prisma.tasks.update({
+            where: {
+                id,
+                Users: {
+                    id: req.user.user_id
+                }
+            },
+            data: {
+                status
+            }
+        })
+        
+        res.json()
+    }
 }

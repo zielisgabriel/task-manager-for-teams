@@ -8,5 +8,6 @@ const tasksController = new TasksController()
 
 tasksRoutes.get('/tasks', ensureAuthentication, verifyUserAuthorization(['ADMIN', 'MEMBER']), tasksController.index)
 tasksRoutes.post('/tasks', ensureAuthentication, verifyUserAuthorization(['ADMIN']), tasksController.create)
+tasksRoutes.patch('/tasks/:id', ensureAuthentication, verifyUserAuthorization(['ADMIN', 'MEMBER']), tasksController.updateStatus)
 
 export { tasksRoutes }
